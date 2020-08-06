@@ -98,12 +98,6 @@ class MAZE_API AMazeGenerator : public AActor
     GENERATED_BODY()
 
 public:
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MazeHUD)
-    bool RunInConstructor;
-
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MazeHUD)
-    bool ShowTests;
     
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MazeGen101isMax)
     float MazeXKeepODD;
@@ -116,16 +110,7 @@ public:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = MazeTiles)
     TSubclassOf<AActor> Ground;
-    
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = MazeTiles)
-    UClass* TileGroundBP;
-    
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = MazeTiles)
-    UClass* TileBlockBP;
-    
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = MazeTiles)
-    UClass* TilePillarBP;
-    
+        
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = MazeTiles)
     UClass* TileStartBP;
     
@@ -133,12 +118,10 @@ public:
     UClass* TileEndBP;
     
     UFUNCTION(BlueprintCallable, Category = MazeGen)
-    void GenMaze(float tileX, float tileY);
+    void GenerateMaze(float tileX, float tileY);
 
     UPROPERTY()
-    FMazeGrid JoyMazeGrid;
-    
-    virtual void PostInitializeComponents() override;
+    FMazeGrid MazeGrid;
     
     // Sets default values for this actor's properties
     AMazeGenerator();
@@ -152,28 +135,3 @@ public:
     virtual void Tick(float DeltaTime) override;
     
 };
-
-template <typename AMazeGen>
-FORCEINLINE AMazeGen* SpawnBP(
-    UWorld* TheWorld,
-    UClass* TheBP,
-    const FVector& Loc,
-    const FRotator& Rot,
-    const bool bNoFail = true,
-    AActor* Owner = NULL,
-    APawn* Instigator = NULL
-    ){
-    if (!TheWorld) return NULL;
-    if (!TheBP) return NULL;
-    //~~~~~~~~~~~
-
-
-    FActorSpawnParameters SpawnInfo;
-    SpawnInfo.bNoFail = bNoFail;
-    SpawnInfo.Owner = Owner;
-    SpawnInfo.Instigator = Instigator;
-    SpawnInfo.bDeferConstruction = false;
-
-
-    return TheWorld->SpawnActor<AMazeGen>(TheBP, Loc, Rot, SpawnInfo);
-}
