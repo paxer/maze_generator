@@ -17,13 +17,14 @@ AWall::AWall()
     Mesh->SetRelativeLocation(FVector(200, 200, 0));
     Mesh->SetRelativeScale3D(FVector(4, 4, 4));
     Mesh->SetupAttachment(RootComponent);
-    SetActorLabel("Wall"); // todo used in gen?	
+    	
 }
 
 // Called when the game starts or when spawned
 void AWall::BeginPlay()
 {
     Super::BeginPlay();
+    SetActorLabel("Wall"); // todo used in gen?
 }
 
 // Called every frame
