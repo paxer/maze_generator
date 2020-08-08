@@ -24,7 +24,6 @@ AWall::AWall()
 void AWall::BeginPlay()
 {
     Super::BeginPlay();
-    SetActorLabel("Wall"); // todo used in gen?
 }
 
 // Called every frame
