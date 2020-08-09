@@ -16,7 +16,7 @@
 	"Plugins": [
 		{
 			"Name": "RiderLink",
-			"Enabled": true
+			"Enabled": false
 		},
 		{
 			"Name": "Prefabricator",
