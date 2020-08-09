@@ -118,7 +118,7 @@ public:
     UClass* TileEndBP;
 
     UFUNCTION(BlueprintCallable, Category = MazeGen)
-    void GenerateMaze(float tileX, float tileY);
+    void GenerateMaze(float TileX, float TileY);
 
     UPROPERTY()
     FMazeGrid MazeGrid;

@@ -31,7 +31,7 @@ void AMazeGenerator::Tick(float DeltaTime)
 }
 
 
-void AMazeGenerator::GenerateMaze(float tileX, float tileY)
+void AMazeGenerator::GenerateMaze(const float TileX, const float TileY)
 {
     if (Ground == nullptr || Wall == nullptr)
     {
@@ -40,19 +40,19 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
 
     float CaptureX = 0.0f;
     float CaptureY = 0.0f;
-    float offset = 400.0f;
-    float ZOffset = -200.0f;
+    const float Offset = 400.0f;
+    const float ZOffset = -200.0f;
 
     //Init Maze
     MazeGrid.Clear();
-    MazeGrid.AddUninitialized(tileX, tileY);
+    MazeGrid.AddUninitialized(TileX, TileY);
 
     // this builds outer walls and the initial symmetric grid structure filled with walls separated equally by ground blocks
-    for (int x = 0; x < tileX; x++)
+    for (int x = 0; x < TileX; x++)
     {
-        for (int y = 0; y < tileY; y++)
+        for (int y = 0; y < TileY; y++)
         {
-            if (y == 0 || x == 0 || y == tileY - 1 || x == tileX - 1 || y % 2 == 0 && x % 2 == 0)
+            if (y == 0 || x == 0 || y == TileY - 1 || x == TileX - 1 || y % 2 == 0 && x % 2 == 0)
             {
                 const FVector Location(CaptureX, CaptureY, 0.0f);
                 MazeGrid.Rows[x].Columns[y] = SpawnBlock(Wall, Location);
@@ -63,71 +63,73 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
                 MazeGrid.Rows[x].Columns[y] = SpawnBlock(Ground, Location);;
             }
             
-            if (CaptureX == offset && CaptureY == offset)
+            if (CaptureX == Offset && CaptureY == Offset)
             {
                 ReplaceBlock(TileStartBP, 1, 1, ZOffset);
             }
             
-            if (y == tileY - 1 && x == tileX - 1)
+            if (y == TileY - 1 && x == TileX - 1)
             {
                 ReplaceBlock(TileEndBP, x - 1, y - 1);
             }
-            CaptureY += offset;
-            if (CaptureY >= offset * tileY) { CaptureY = 0; }
+            CaptureY += Offset;
+            if (CaptureY >= Offset * TileY) { CaptureY = 0; }
         }
-        CaptureX += offset;
-        if (CaptureX >= offset * tileX) { CaptureX = 0; }
+        CaptureX += Offset;
+        if (CaptureX >= Offset * TileX) { CaptureX = 0; }
     }
     
     //this adds walls to the existing grid to form random corridors
 
-    for (int y = 2; y < tileY - 1; y += 2)
+    for (int y = 2; y < TileY - 1; y += 2)
     {
-        int dx = 2;
-        int dy = y;
+        int Dx = 2;
+        int Dy = y;
         //int rnd4;
     
         switch (rand() % 4)
         {
-        case 0: dx++;
+        case 0: Dx++;
             break;
-        case 1: dx--;
+        case 1: Dx--;
             break;
-        case 2: dy++;
+        case 2: Dy++;
             break;
-        case 3: dy--;
+        case 3: Dy--;
             break;
+        default: break;
         }
     
-        if (!MazeGrid.Rows[dx].Columns[dy]->IsA(AWall::StaticClass()))
+        if (!MazeGrid.Rows[Dx].Columns[Dy]->IsA(AWall::StaticClass()))
         {
-            ReplaceBlock(Wall, dx, dy, 0.0f);
+            ReplaceBlock(Wall, Dx, Dy, 0.0f);
         }
         else
         {
             y -= 2;
         }
     }
-    for (int x = 4; x < tileX - 1; x += 2)
+    for (int x = 4; x < TileX - 1; x += 2)
     {
-        for (int y = 2; y < tileY - 1; y += 2)
+        for (int y = 2; y < TileY - 1; y += 2)
         {
-            int dx = x;
-            int dy = y;            
+            int Dx = x;
+            int Dy = y;            
     
             switch (rand() % 3)
             {
-            case 0: dy++;
+            case 0: Dy++;
                 break;
-            case 1: dy--;
+            case 1: Dy--;
                 break;
-            case 2: dx++;
+            case 2: Dx++;
                 break;
+            default: break;
             }
     
-            if (!MazeGrid.Rows[dx].Columns[dy]->IsA(AWall::StaticClass()))
+            if (!MazeGrid.Rows[Dx].Columns[Dy]->IsA(AWall::StaticClass()))
             {
-                ReplaceBlock(Wall, dx, dy, 0.0f);
+                ReplaceBlock(Wall, Dx, Dy, 0.0f);
             }
             else
             {
@@ -137,7 +139,7 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
     }
 }
 
-AActor* AMazeGenerator::SpawnBlock(UClass* BlockType, FVector Location, FRotator Rotation)
+AActor* AMazeGenerator::SpawnBlock(UClass* BlockType, const FVector Location, const FRotator Rotation)
 {
     AActor* NewBlock = GetWorld()->SpawnActor<AActor>(BlockType, Location, Rotation);
     #if WITH_EDITOR
