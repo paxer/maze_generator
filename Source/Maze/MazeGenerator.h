@@ -19,10 +19,10 @@ struct FMazeGridRow
     {
         Columns.Add(NULL);
     }
+
     //default properties
     FMazeGridRow()
     {
-
     }
 };
 
@@ -84,10 +84,10 @@ struct FMazeGrid
         }
         Rows.Empty();
     }
+
     //default properties
     FMazeGrid()
     {
-
     }
 };
 
@@ -98,10 +98,10 @@ class MAZE_API AMazeGenerator : public AActor
     GENERATED_BODY()
 
 public:
-    
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MazeGen101isMax)
     float MazeXKeepODD;
-    
+
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MazeGen101isMax)
     float MazeYKeepODD;
 
@@ -110,19 +110,19 @@ public:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = MazeTiles)
     TSubclassOf<AActor> Ground;
-        
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = MazeTiles)
     UClass* TileStartBP;
-    
+
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = MazeTiles)
     UClass* TileEndBP;
-    
+
     UFUNCTION(BlueprintCallable, Category = MazeGen)
     void GenerateMaze(float tileX, float tileY);
 
     UPROPERTY()
     FMazeGrid MazeGrid;
-    
+
     // Sets default values for this actor's properties
     AMazeGenerator();
 
@@ -133,5 +133,7 @@ protected:
 public:
     // Called every frame
     virtual void Tick(float DeltaTime) override;
-    
+
+ private:
+    AActor* SpawnBlock(UClass* BlockType, FVector Location, FRotator Rotation = FRotator(0,0,0));
 };

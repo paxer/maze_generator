@@ -30,9 +30,10 @@ void AMazeGenerator::Tick(float DeltaTime)
     Super::Tick(DeltaTime);
 }
 
+
 void AMazeGenerator::GenerateMaze(float tileX, float tileY)
 {
-    if (Ground == nullptr)
+    if (Ground == nullptr || Wall == nullptr)
     {
         return;
     }
@@ -41,9 +42,6 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
     float CaptureY = 0.0f;
     float offset = 400.0f;
     float ZOffset = -200.0f;
-    float iter = 0;
-    int tileID = 0;
-    int RandomEndTileLoc = rand() % ((int)tileX - 1) + 1;
 
     //Init Maze
     MazeGrid.Clear();
@@ -55,49 +53,27 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
         {
             if (y == 0 || x == 0 || y == tileY - 1 || x == tileX - 1 || y % 2 == 0 && x % 2 == 0)
             {
-                const FVector GenSpawnLoc(CaptureX, CaptureY, 0.0f);
-                const FRotator GenSpawnRot(0.0f, 0.0f, 0.0f);
-                AActor* WallActor = GetWorld()->SpawnActor<AActor>(Wall, GenSpawnLoc, GenSpawnRot);                
-                #if WITH_EDITOR
-                  WallActor->SetFolderPath("/Maze");
-                #endif
-                MazeGrid.Rows[x].Columns[y] = WallActor;
+                const FVector Location(CaptureX, CaptureY, 0.0f);
+                MazeGrid.Rows[x].Columns[y] = SpawnBlock(Wall, Location);
             }
             else
             {
-                const FVector GenSpawnLoc(CaptureX, CaptureY, ZOffset);
-                const FRotator GenSpawnRot(0.0f, 0.0f, 0.0f);
-                AActor* GroundActor = GetWorld()->SpawnActor<AActor>(Ground, GenSpawnLoc, GenSpawnRot);
-                #if WITH_EDITOR
-                  GroundActor->SetFolderPath("/Maze");
-                #endif
-                MazeGrid.Rows[x].Columns[y] = GroundActor;
+                const FVector Location(CaptureX, CaptureY, ZOffset);
+                MazeGrid.Rows[x].Columns[y] = SpawnBlock(Ground, Location);;
             }
-            //-------------Starting Tile Spawn---------------
+            
             if (CaptureX == offset && CaptureY == offset)
             {
                 MazeGrid.Rows[1].Columns[1]->Destroy();
-
-                const FVector GenSpawnLoc(offset, offset, ZOffset);
-                const FRotator GenSpawnRot(0.0f, 0.0f, 0.0f);
-                //Tile Start
-                AActor* StartTile = GetWorld()->SpawnActor<AActor>(TileStartBP, GenSpawnLoc, GenSpawnRot);
-                #if WITH_EDITOR
-                  StartTile->SetFolderPath("/Maze");
-                #endif
-                MazeGrid.Rows[1].Columns[1] = StartTile;
+                const FVector Location(offset, offset, ZOffset);
+                MazeGrid.Rows[1].Columns[1] = SpawnBlock(TileStartBP, Location);;
             }
-            //-------------Ending Tile Spawn---------------
+            
             if (y == tileY - 1 && x == tileX - 1)
             {
                 auto Location = MazeGrid.Rows[x - 1].Columns[y - 1]->GetActorLocation();
-                MazeGrid.Rows[x - 1].Columns[y - 1]->Destroy();                
-
-                const FVector GenSpawnLoc(Location);
-                const FRotator GenSpawnRot(0.0f, 0.0f, 0.0f);
-                // Tile End
-                AActor* EndTile = GetWorld()->SpawnActor<AActor>(TileEndBP, GenSpawnLoc, GenSpawnRot);
-                MazeGrid.Rows[x - 1].Columns[y - 1] = EndTile;
+                MazeGrid.Rows[x - 1].Columns[y - 1]->Destroy();
+                MazeGrid.Rows[x - 1].Columns[y - 1] = SpawnBlock(TileEndBP, Location);;
             }
             CaptureY += offset;
             if (CaptureY >= offset * tileY) { CaptureY = 0; }
@@ -105,15 +81,15 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
         CaptureX += offset;
         if (CaptureX >= offset * tileX) { CaptureX = 0; }
     }
-    //-----------------------------------------------This adds walls to the existing grid to form corridors----------------------------------------------------------
+    //-----------------------------------------------This adds walls to the existing grid to form random corridors----------------------------------------------------------
 
     for (int y = 2; y < tileY - 1; y += 2)
     {
         int dx = 2;
         int dy = y;
-        int rnd4;
+        //int rnd4;
 
-        switch (rnd4 = rand() % 4)
+        switch (rand() % 4)
         {
         case 0: dx++;
             break;
@@ -124,21 +100,13 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
         case 3: dy--;
             break;
         }
-        
-        if(!MazeGrid.Rows[dx].Columns[dy]->IsA(AWall::StaticClass()))
+
+        if (!MazeGrid.Rows[dx].Columns[dy]->IsA(AWall::StaticClass()))
         {
-            FVector ActorLocation = MazeGrid.Rows[dx].Columns[dy]->GetActorLocation();
-            ActorLocation.Z = 0;
+            FVector Location = MazeGrid.Rows[dx].Columns[dy]->GetActorLocation();
+            Location.Z = 0;
             MazeGrid.Rows[dx].Columns[dy]->Destroy();
-
-            const FVector GenSpawnLoc(ActorLocation);
-            const FRotator GenSpawnRot(0.0f, 0.0f, 0.0f);
-
-            AActor* BlockTile = GetWorld()->SpawnActor<AActor>(Wall, GenSpawnLoc, GenSpawnRot);
-            #if WITH_EDITOR
-              BlockTile->SetFolderPath("/Maze");
-            #endif
-            MazeGrid.Rows[dx].Columns[dy] = BlockTile;
+            MazeGrid.Rows[dx].Columns[dy] = SpawnBlock(Wall, Location);;
         }
         else
         {
@@ -150,10 +118,9 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
         for (int y = 2; y < tileY - 1; y += 2)
         {
             int dx = x;
-            int dy = y;
-            int rnd3;
+            int dy = y;            
 
-            switch (rnd3 = rand() % 3)
+            switch (rand() % 3)
             {
             case 0: dy++;
                 break;
@@ -162,21 +129,13 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
             case 2: dx++;
                 break;
             }
-            
-            if(!MazeGrid.Rows[dx].Columns[dy]->IsA(AWall::StaticClass()))
+
+            if (!MazeGrid.Rows[dx].Columns[dy]->IsA(AWall::StaticClass()))
             {
-                FVector ActorLocation = MazeGrid.Rows[dx].Columns[dy]->GetActorLocation();
-                ActorLocation.Z = 0;
+                FVector Location = MazeGrid.Rows[dx].Columns[dy]->GetActorLocation();
+                Location.Z = 0;
                 MazeGrid.Rows[dx].Columns[dy]->Destroy();
-
-                const FVector GenSpawnLoc(ActorLocation);
-                const FRotator GenSpawnRot(0.0f, 0.0f, 0.0f);
-
-                AActor* BlockTile = GetWorld()->SpawnActor<AActor>(Wall, GenSpawnLoc, GenSpawnRot);
-                #if WITH_EDITOR
-                    BlockTile->SetFolderPath("/Maze");
-                #endif
-                MazeGrid.Rows[dx].Columns[dy] = BlockTile;
+                MazeGrid.Rows[dx].Columns[dy] = SpawnBlock(Wall, Location);;
             }
             else
             {
@@ -184,4 +143,13 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
             }
         }
     }
+}
+
+AActor* AMazeGenerator::SpawnBlock(UClass* BlockType, FVector Location, FRotator Rotation)
+{
+    AActor* NewBlock = GetWorld()->SpawnActor<AActor>(BlockType, Location, Rotation);
+    #if WITH_EDITOR
+        NewBlock->SetFolderPath("/Maze");
+    #endif
+    return NewBlock;
 }
