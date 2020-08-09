@@ -65,16 +65,12 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
             
             if (CaptureX == offset && CaptureY == offset)
             {
-                MazeGrid.Rows[1].Columns[1]->Destroy();
-                const FVector Location(offset, offset, ZOffset);
-                MazeGrid.Rows[1].Columns[1] = SpawnBlock(TileStartBP, Location);;
+                ReplaceBlock(TileStartBP, 1, 1, ZOffset);
             }
             
             if (y == tileY - 1 && x == tileX - 1)
             {
-                const auto Location = MazeGrid.Rows[x - 1].Columns[y - 1]->GetActorLocation();
-                MazeGrid.Rows[x - 1].Columns[y - 1]->Destroy();
-                MazeGrid.Rows[x - 1].Columns[y - 1] = SpawnBlock(TileEndBP, Location);;
+                ReplaceBlock(TileEndBP, x - 1, y - 1);
             }
             CaptureY += offset;
             if (CaptureY >= offset * tileY) { CaptureY = 0; }
@@ -105,10 +101,7 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
     
         if (!MazeGrid.Rows[dx].Columns[dy]->IsA(AWall::StaticClass()))
         {
-            FVector Location = MazeGrid.Rows[dx].Columns[dy]->GetActorLocation();
-            Location.Z = 0;
-            MazeGrid.Rows[dx].Columns[dy]->Destroy();
-            MazeGrid.Rows[dx].Columns[dy] = SpawnBlock(Wall, Location);;
+            ReplaceBlock(Wall, dx, dy, 0.0f);
         }
         else
         {
@@ -134,10 +127,7 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
     
             if (!MazeGrid.Rows[dx].Columns[dy]->IsA(AWall::StaticClass()))
             {
-                FVector Location = MazeGrid.Rows[dx].Columns[dy]->GetActorLocation();
-                Location.Z = 0;
-                MazeGrid.Rows[dx].Columns[dy]->Destroy();
-                MazeGrid.Rows[dx].Columns[dy] = SpawnBlock(Wall, Location);;
+                ReplaceBlock(Wall, dx, dy, 0.0f);
             }
             else
             {
@@ -154,4 +144,21 @@ AActor* AMazeGenerator::SpawnBlock(UClass* BlockType, FVector Location, FRotator
         NewBlock->SetFolderPath("/Maze");
     #endif
     return NewBlock;
+}
+
+
+void AMazeGenerator::ReplaceBlock(UClass* NewBlock, const int MazeX, const int MazeY, const float ZLocation)
+{
+    auto BlockToDestroy = MazeGrid.Rows[MazeX].Columns[MazeY];
+    if(BlockToDestroy != nullptr)
+    {
+        FVector Location = BlockToDestroy->GetActorLocation();
+        // this is because NULL is fucking == to 0.0f and we need to pass 0.0 in some cases, so we use 1.0 as a default
+        if(ZLocation != 1.0f)
+        {
+            Location.Z = ZLocation;            
+        }
+        BlockToDestroy->Destroy();
+        MazeGrid.Rows[MazeX].Columns[MazeY] = SpawnBlock(NewBlock, Location);;
+    }
 }

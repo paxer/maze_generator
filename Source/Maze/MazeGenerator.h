@@ -135,5 +135,6 @@ public:
     virtual void Tick(float DeltaTime) override;
 
  private:
+    void ReplaceBlock(UClass* NewBlock, int MazeX, int MazeY, float ZLocation = 1.0f);
     AActor* SpawnBlock(UClass* BlockType, FVector Location, FRotator Rotation = FRotator(0,0,0));
 };
