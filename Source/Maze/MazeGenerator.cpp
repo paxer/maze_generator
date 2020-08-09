@@ -47,6 +47,7 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
     MazeGrid.Clear();
     MazeGrid.AddUninitialized(tileX, tileY);
 
+    // this builds outer walls and the initial symmetric grid structure filled with walls separated equally by ground blocks
     for (int x = 0; x < tileX; x++)
     {
         for (int y = 0; y < tileY; y++)
@@ -71,7 +72,7 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
             
             if (y == tileY - 1 && x == tileX - 1)
             {
-                auto Location = MazeGrid.Rows[x - 1].Columns[y - 1]->GetActorLocation();
+                const auto Location = MazeGrid.Rows[x - 1].Columns[y - 1]->GetActorLocation();
                 MazeGrid.Rows[x - 1].Columns[y - 1]->Destroy();
                 MazeGrid.Rows[x - 1].Columns[y - 1] = SpawnBlock(TileEndBP, Location);;
             }
@@ -81,14 +82,15 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
         CaptureX += offset;
         if (CaptureX >= offset * tileX) { CaptureX = 0; }
     }
-    //-----------------------------------------------This adds walls to the existing grid to form random corridors----------------------------------------------------------
+    
+    //this adds walls to the existing grid to form random corridors
 
     for (int y = 2; y < tileY - 1; y += 2)
     {
         int dx = 2;
         int dy = y;
         //int rnd4;
-
+    
         switch (rand() % 4)
         {
         case 0: dx++;
@@ -100,7 +102,7 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
         case 3: dy--;
             break;
         }
-
+    
         if (!MazeGrid.Rows[dx].Columns[dy]->IsA(AWall::StaticClass()))
         {
             FVector Location = MazeGrid.Rows[dx].Columns[dy]->GetActorLocation();
@@ -119,7 +121,7 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
         {
             int dx = x;
             int dy = y;            
-
+    
             switch (rand() % 3)
             {
             case 0: dy++;
@@ -129,7 +131,7 @@ void AMazeGenerator::GenerateMaze(float tileX, float tileY)
             case 2: dx++;
                 break;
             }
-
+    
             if (!MazeGrid.Rows[dx].Columns[dy]->IsA(AWall::StaticClass()))
             {
                 FVector Location = MazeGrid.Rows[dx].Columns[dy]->GetActorLocation();
