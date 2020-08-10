@@ -61,16 +61,7 @@ void AMazeGenerator::GenerateMaze(const float TileX, const float TileY)
                 const FVector Location(CaptureX, CaptureY, 0.0f);
                 MazeGrid.Rows[x].Columns[y] = SpawnBlock(Ground, Location);;
             }
-            
-            if (CaptureX == Offset && CaptureY == Offset)
-            {
-                ReplaceBlock(TileStartBP, 1, 1);
-            }
-            
-            if (y == TileY - 1 && x == TileX - 1)
-            {
-                ReplaceBlock(TileEndBP, x - 1, y - 1);
-            }
+
             CaptureY += Offset;
             if (CaptureY >= Offset * TileY) { CaptureY = 0; }
         }

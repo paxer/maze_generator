@@ -112,10 +112,7 @@ public:
     TSubclassOf<AActor> Ground;
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = MazeTiles)
-    UClass* TileStartBP;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = MazeTiles)
-    UClass* TileEndBP;
+    TSubclassOf<AActor> Portal;
 
     UFUNCTION(BlueprintCallable, Category = MazeGen)
     void GenerateMaze(float TileX, float TileY);
