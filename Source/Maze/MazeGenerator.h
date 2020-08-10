@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-#include "Engine/StaticMeshActor.h"
 #include "MazeGenerator.generated.h"
 
 USTRUCT()
@@ -110,9 +109,6 @@ public:
 
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = MazeTiles)
     TSubclassOf<AActor> Ground;
-
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = MazeTiles)
-    TSubclassOf<AActor> Portal;
 
     UFUNCTION(BlueprintCallable, Category = MazeGen)
     void GenerateMaze(float TileX, float TileY);
