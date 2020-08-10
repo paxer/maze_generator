@@ -40,8 +40,7 @@ void AMazeGenerator::GenerateMaze(const float TileX, const float TileY)
 
     float CaptureX = 0.0f;
     float CaptureY = 0.0f;
-    const float Offset = 400.0f;
-    const float ZOffset = -200.0f;
+    const float Offset = 350.0f;
 
     //Init Maze
     MazeGrid.Clear();
@@ -59,13 +58,13 @@ void AMazeGenerator::GenerateMaze(const float TileX, const float TileY)
             }
             else
             {
-                const FVector Location(CaptureX, CaptureY, ZOffset);
+                const FVector Location(CaptureX, CaptureY, 0.0f);
                 MazeGrid.Rows[x].Columns[y] = SpawnBlock(Ground, Location);;
             }
             
             if (CaptureX == Offset && CaptureY == Offset)
             {
-                ReplaceBlock(TileStartBP, 1, 1, ZOffset);
+                ReplaceBlock(TileStartBP, 1, 1);
             }
             
             if (y == TileY - 1 && x == TileX - 1)
@@ -102,7 +101,7 @@ void AMazeGenerator::GenerateMaze(const float TileX, const float TileY)
     
         if (!MazeGrid.Rows[Dx].Columns[Dy]->IsA(AWall::StaticClass()))
         {
-            ReplaceBlock(Wall, Dx, Dy, 0.0f);
+            ReplaceBlock(Wall, Dx, Dy);
         }
         else
         {
@@ -129,7 +128,7 @@ void AMazeGenerator::GenerateMaze(const float TileX, const float TileY)
     
             if (!MazeGrid.Rows[Dx].Columns[Dy]->IsA(AWall::StaticClass()))
             {
-                ReplaceBlock(Wall, Dx, Dy, 0.0f);
+                ReplaceBlock(Wall, Dx, Dy);
             }
             else
             {
@@ -149,17 +148,12 @@ AActor* AMazeGenerator::SpawnBlock(UClass* BlockType, const FVector Location, co
 }
 
 
-void AMazeGenerator::ReplaceBlock(UClass* NewBlock, const int MazeX, const int MazeY, const float ZLocation)
+void AMazeGenerator::ReplaceBlock(UClass* NewBlock, const int MazeX, const int MazeY)
 {
     auto BlockToDestroy = MazeGrid.Rows[MazeX].Columns[MazeY];
     if(BlockToDestroy != nullptr)
     {
         FVector Location = BlockToDestroy->GetActorLocation();
-        // this is because NULL is fucking == to 0.0f and we need to pass 0.0 in some cases, so we use 1.0 as a default
-        if(ZLocation != 1.0f)
-        {
-            Location.Z = ZLocation;            
-        }
         BlockToDestroy->Destroy();
         MazeGrid.Rows[MazeX].Columns[MazeY] = SpawnBlock(NewBlock, Location);;
     }
