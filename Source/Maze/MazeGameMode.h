@@ -9,11 +9,21 @@
 UCLASS(minimalapi)
 class AMazeGameMode : public AGameModeBase
 {
-	GENERATED_BODY()
+    GENERATED_BODY()
 
 public:
-	AMazeGameMode();
+    AMazeGameMode();
+
+    virtual void Tick(float DeltaTime) override;
+
+protected:
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;    
+
+private:
+    FTimerHandle MazeCompletionTimerHandle;
+
+    int32 TotalSecondsMazeCompletion;
+
+    void IncrementMazeCompletionTime();
 };
-
-
-
