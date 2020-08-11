@@ -98,20 +98,20 @@ class MAZE_API AMazeGenerator : public AActor
 
 public:
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MazeGen101isMax)
-    float MazeXKeepODD;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Maze Properites")
+    int SizeX;
 
-    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = MazeGen101isMax)
-    float MazeYKeepODD;
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Maze Properites")
+    int SizeY;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = MazeTiles)
-    UClass* Wall;
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Maze Properites")
+    TSubclassOf<AActor> Wall;
 
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = MazeTiles)
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Maze Properites")
     TSubclassOf<AActor> Ground;
 
     UFUNCTION(BlueprintCallable, Category = MazeGen)
-    void GenerateMaze(float TileX, float TileY);
+    void GenerateMaze(int TileX, int TileY);
 
     UPROPERTY()
     FMazeGrid MazeGrid;

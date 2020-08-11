@@ -10,18 +10,17 @@ const int MazeSizeMax = 101;
 
 // Sets default values
 AMazeGenerator::AMazeGenerator()
-{
-    // Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+{    
     PrimaryActorTick.bCanEverTick = true;
-    MazeXKeepODD = 5; //MazeSizeMax;
-    MazeYKeepODD = 5; //MazeSizeMax;
+    SizeX = 5;
+    SizeY = 5;
 }
 
 // Called when the game starts or when spawned
 void AMazeGenerator::BeginPlay()
 {
     Super::BeginPlay();
-    GenerateMaze(MazeXKeepODD, MazeYKeepODD);
+    GenerateMaze(SizeX, SizeY);
 }
 
 // Called every frame
@@ -31,8 +30,18 @@ void AMazeGenerator::Tick(float DeltaTime)
 }
 
 
-void AMazeGenerator::GenerateMaze(const float TileX, const float TileY)
+void AMazeGenerator::GenerateMaze(const int TileX, const int TileY)
 {
+    // only odd numbers allowed
+    if (TileX % 2 == 0 || TileY % 2 == 0)
+    {
+        if (GEngine)
+        {
+            GEngine->AddOnScreenDebugMessage(-1, 15.0f, FColor::Yellow, TEXT("Only odd numbers allowed for Maze size X and Y!"));   
+        }
+        return;
+    }
+    
     if (Ground == nullptr || Wall == nullptr)
     {
         return;
