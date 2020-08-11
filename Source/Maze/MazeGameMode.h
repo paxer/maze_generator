@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
+#include "Asset/PrefabricatorAsset.h"
 #include "MazeGameMode.generated.h"
 
 UCLASS(minimalapi)
@@ -15,6 +16,9 @@ public:
     AMazeGameMode();
 
     virtual void Tick(float DeltaTime) override;
+
+    UPROPERTY(EditDefaultsOnly, Category=Levels)
+    UPrefabricatorAsset* MyPrefab;
 
 protected:
     // Called when the game starts or when spawned

@@ -2,6 +2,7 @@
 
 #include "MazeGameMode.h"
 #include "ExitPortal.h"
+#include "Utils/PrefabricatorFunctionLibrary.h"
 #include "Kismet/GameplayStatics.h"
 
 AMazeGameMode::AMazeGameMode() : Super()
@@ -38,6 +39,12 @@ void AMazeGameMode::LevelComplete()
     }
     GetWorldTimerManager().ClearTimer(MazeCompletionTimerHandle);
     // TODO: load next level
+    //
+    // if(MyPrefab)
+    // {
+    //     UPrefabricatorBlueprintLibrary::SpawnPrefab(GetWorld(), MyPrefab, FTransform(), 0);
+    // }
+
 }
 
 void AMazeGameMode::SubscribeToLevelCompleteEvent()
