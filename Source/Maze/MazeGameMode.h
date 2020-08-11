@@ -26,4 +26,9 @@ private:
     int32 TotalSecondsMazeCompletion;
 
     void IncrementMazeCompletionTime();
+
+    UFUNCTION()
+    void LevelComplete();
+
+    void SubscribeToLevelCompleteEvent();
 };

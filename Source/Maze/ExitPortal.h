@@ -6,28 +6,31 @@
 #include "GameFramework/Actor.h"
 #include "ExitPortal.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FLevelComplete);
+
 UCLASS()
 class MAZE_API AExitPortal : public AActor
 {
-	GENERATED_BODY()
-	
-public:	
-	// Sets default values for this actor's properties
-	AExitPortal();
+    GENERATED_BODY()
+
+public:
+    // Sets default values for this actor's properties
+    AExitPortal();
+
+    UPROPERTY(BlueprintAssignable, Category = Callback)
+    FLevelComplete LevelComplete;
 
 protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
+    // Called when the game starts or when spawned
+    virtual void BeginPlay() override;
 
-	// TODO: make it box OverlapComp = CreateDefaultSubobject<UBoxComponent>(TEXT("OverlapComp"));
-	UPROPERTY(EditDefaultsOnly, Category=Components)
-	UStaticMeshComponent* Mesh;
+    UPROPERTY(EditDefaultsOnly, Category=Components)
+    UStaticMeshComponent* Mesh;
 
-	UFUNCTION()
-	void OnPortalBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
+    UFUNCTION()
+    void OnPortalBeginOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult);
 
-public:	
-	// Called every frame
-	virtual void Tick(float DeltaTime) override;
-
+public:
+    // Called every frame
+    virtual void Tick(float DeltaTime) override;
 };

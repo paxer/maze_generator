@@ -1,6 +1,8 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "MazeGameMode.h"
+#include "ExitPortal.h"
+#include "Kismet/GameplayStatics.h"
 
 AMazeGameMode::AMazeGameMode() : Super()
 {
@@ -12,6 +14,7 @@ void AMazeGameMode::BeginPlay()
 {
     Super::BeginPlay();
     GetWorldTimerManager().SetTimer(MazeCompletionTimerHandle, this, &AMazeGameMode::IncrementMazeCompletionTime, 1.0f, true);
+    SubscribeToLevelCompleteEvent();
 }
 
 void AMazeGameMode::Tick(float DeltaTime)
@@ -23,9 +26,30 @@ void AMazeGameMode::Tick(float DeltaTime)
 void AMazeGameMode::IncrementMazeCompletionTime()
 {
     TotalSecondsMazeCompletion = TotalSecondsMazeCompletion + 1;
+}
 
-    // if(GEngine)
-    // {
-    //     GEngine->AddOnScreenDebugMessage(-1, 1.0f, FColor::Yellow, FString::Printf(TEXT("Seconds since start: %d"), TotalSecondsMazeCompletion));
-    // }
+void AMazeGameMode::LevelComplete()
+{
+    UE_LOG(LogTemp, Warning, TEXT("LEVEL COMPLETE CALLED"))
+
+    if (GEngine)
+    {
+        GEngine->AddOnScreenDebugMessage(-1, 100.0f, FColor::Yellow, FString::Printf(TEXT("Level Complete, seconds since start: %d"), TotalSecondsMazeCompletion));
+    }
+    GetWorldTimerManager().ClearTimer(MazeCompletionTimerHandle);
+    // TODO: load next level
+}
+
+void AMazeGameMode::SubscribeToLevelCompleteEvent()
+{
+    TArray<AActor*> FoundActors;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), AExitPortal::StaticClass(), FoundActors);
+    if (FoundActors.Num() > 0)
+    {
+        auto ExitPortal = Cast<AExitPortal>(FoundActors[0]);
+        if (ExitPortal)
+        {            
+            ExitPortal->LevelComplete.AddDynamic(this, &AMazeGameMode::LevelComplete);
+        }
+    }
 }
