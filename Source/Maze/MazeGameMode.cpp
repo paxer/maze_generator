@@ -9,6 +9,8 @@ AMazeGameMode::AMazeGameMode() : Super()
 {
     PrimaryActorTick.bCanEverTick = true;
     TotalSecondsMazeCompletion = 0;
+    bLoadLevels = false;
+    CurrentLevelIndex = 0;
 }
 
 void AMazeGameMode::BeginPlay()
@@ -16,6 +18,16 @@ void AMazeGameMode::BeginPlay()
     Super::BeginPlay();
     GetWorldTimerManager().SetTimer(MazeCompletionTimerHandle, this, &AMazeGameMode::IncrementMazeCompletionTime, 1.0f, true);
     SubscribeToLevelCompleteEvent();
+    if (bLoadLevels)
+    {
+        if (Levels.Num() > 0)
+        {
+            if(Levels[CurrentLevelIndex])
+            {
+                CurrentLevel = UPrefabricatorBlueprintLibrary::SpawnPrefab(GetWorld(), Levels[CurrentLevelIndex] , FTransform(), 0);                
+            }            
+        }
+    }
 }
 
 void AMazeGameMode::Tick(float DeltaTime)
@@ -38,13 +50,21 @@ void AMazeGameMode::LevelComplete()
         GEngine->AddOnScreenDebugMessage(-1, 100.0f, FColor::Yellow, FString::Printf(TEXT("Level Complete, seconds since start: %d"), TotalSecondsMazeCompletion));
     }
     GetWorldTimerManager().ClearTimer(MazeCompletionTimerHandle);
+    if(CurrentLevel)
+    {
+        CurrentLevel->Destroy();        
+    }
+    
     // TODO: load next level
+    //
+    // Find current level (actually the current level should be taken from the array like Levels[CurrentLevelIndex]
+
+
     //
     // if(Levels.Num() > 0) // or something
     // {
     //     UPrefabricatorBlueprintLibrary::SpawnPrefab(GetWorld(), MyPrefab, FTransform(), 0);
     // }
-
 }
 
 void AMazeGameMode::SubscribeToLevelCompleteEvent()
@@ -55,7 +75,7 @@ void AMazeGameMode::SubscribeToLevelCompleteEvent()
     {
         auto ExitPortal = Cast<AExitPortal>(FoundActors[0]);
         if (ExitPortal)
-        {            
+        {
             ExitPortal->LevelComplete.AddDynamic(this, &AMazeGameMode::LevelComplete);
         }
     }

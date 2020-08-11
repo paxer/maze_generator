@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/GameModeBase.h"
 #include "Asset/PrefabricatorAsset.h"
+#include "Prefab/PrefabActor.h"
 #include "MazeGameMode.generated.h"
 
 UCLASS(minimalapi)
@@ -18,16 +19,23 @@ public:
     virtual void Tick(float DeltaTime) override;
 
     UPROPERTY(EditDefaultsOnly, Category=Levels)
-    TArray<UPrefabricatorAsset*> Levels;
+    bool bLoadLevels;
+
+    UPROPERTY(EditDefaultsOnly, Category=Levels)
+    TArray<UPrefabricatorAsset*> Levels;    
 
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;    
 
 private:
+    APrefabActor* CurrentLevel;
+    
     FTimerHandle MazeCompletionTimerHandle;
 
     int32 TotalSecondsMazeCompletion;
+
+    int32 CurrentLevelIndex;
 
     void IncrementMazeCompletionTime();
 
