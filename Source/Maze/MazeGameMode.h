@@ -18,7 +18,7 @@ public:
     virtual void Tick(float DeltaTime) override;
 
     UPROPERTY(EditDefaultsOnly, Category=Levels)
-    UPrefabricatorAsset* MyPrefab;
+    TArray<UPrefabricatorAsset*> Levels;
 
 protected:
     // Called when the game starts or when spawned

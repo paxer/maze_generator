@@ -40,7 +40,7 @@ void AMazeGameMode::LevelComplete()
     GetWorldTimerManager().ClearTimer(MazeCompletionTimerHandle);
     // TODO: load next level
     //
-    // if(MyPrefab)
+    // if(Levels.Num() > 0) // or something
     // {
     //     UPrefabricatorBlueprintLibrary::SpawnPrefab(GetWorld(), MyPrefab, FTransform(), 0);
     // }
