@@ -2,31 +2,71 @@
 
 #include "MazeGameMode.h"
 #include "ExitPortal.h"
-#include "Utils/PrefabricatorFunctionLibrary.h"
+#include "GameFramework/PlayerStart.h"
 #include "Kismet/GameplayStatics.h"
 
 AMazeGameMode::AMazeGameMode() : Super()
 {
     PrimaryActorTick.bCanEverTick = true;
-    TotalSecondsMazeCompletion = 0;
-    bLoadLevels = false;
+    TotalSecondsMazeCompletion = 0;    
     CurrentLevelIndex = 0;
+    bIsGameplayMap = false;
 }
 
 void AMazeGameMode::BeginPlay()
 {
     Super::BeginPlay();
+	
+    auto LevelName = GetWorld()->GetMapName();
+    LevelName.RemoveFromStart(GetWorld()->StreamingLevelsPrefix);
+
+    if (LevelName.Contains("TestLoadLevels"))
+    {
+        bIsGameplayMap = true;
+    }
+
+	
     GetWorldTimerManager().SetTimer(MazeCompletionTimerHandle, this, &AMazeGameMode::IncrementMazeCompletionTime, 1.0f, true);
-    SubscribeToLevelCompleteEvent();
-    if (bLoadLevels)
+    //SubscribeToLevelCompleteEvent();
+	
+    if (bIsGameplayMap)
     {
         if (Levels.Num() > 0)
-        {
+        {            
+        	
             if(Levels[CurrentLevelIndex])
             {
-                CurrentLevel = UPrefabricatorBlueprintLibrary::SpawnPrefab(GetWorld(), Levels[CurrentLevelIndex] , FTransform(), 0);                
+                
+                auto Location = FVector(0,0,0);
+                auto Rotation = FRotator(0,0,0);                
+                CurrentLevel = GetWorld()->SpawnActor<AActor>(Levels[CurrentLevelIndex], Location, Rotation);                
+
+                for (auto ChildActor : CurrentLevel->GetComponents())
+                {
+
+                    UE_LOG(LogTemp, Warning, TEXT("WORKING"))
+                    if (ChildActor->IsA(APlayerStart::StaticClass()))
+                    {
+                        UE_LOG(LogTemp, Warning, TEXT("FOUND PLAYER START"))
+                    }
+
+                    if (ChildActor->IsA(AExitPortal::StaticClass()))
+                    {
+                        UE_LOG(LogTemp, Warning, TEXT("FOUND EXIT PORTAL"))
+                        auto ExitPortal = Cast<AExitPortal>(ChildActor);
+                        if(ExitPortal)
+                        {
+                            UE_LOG(LogTemp, Warning, TEXT("SUBSCRIBED TO  EXIT PORTAL EVENT"))
+                            ExitPortal->LevelComplete.AddDynamic(this, &AMazeGameMode::LevelComplete);                            
+                        }
+                        
+                    }
+                }
+                
             }            
         }
+
+        //FindPlayerStartPosition();    	
     }
 }
 
@@ -67,6 +107,8 @@ void AMazeGameMode::LevelComplete()
     // }
 }
 
+
+
 void AMazeGameMode::SubscribeToLevelCompleteEvent()
 {
     TArray<AActor*> FoundActors;
@@ -79,4 +121,27 @@ void AMazeGameMode::SubscribeToLevelCompleteEvent()
             ExitPortal->LevelComplete.AddDynamic(this, &AMazeGameMode::LevelComplete);
         }
     }
+    else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("NO EXIT PORTAL!!!!!"))
+    }
+}
+
+void AMazeGameMode::FindPlayerStartPosition()
+{
+    TArray<AActor*> FoundActors;
+    UGameplayStatics::GetAllActorsOfClass(GetWorld(), APlayerStart::StaticClass(), FoundActors);
+    if (FoundActors.Num() > 0)
+    {
+        auto PlayerStart = Cast<APlayerStart>(FoundActors[0]);
+        if (PlayerStart)
+        {
+            //ExitPortal->LevelComplete.AddDynamic(this, &AMazeGameMode::LevelComplete);
+        	UE_LOG(LogTemp, Warning, TEXT("WE FOUND PLAYER START!!!!!"))
+        }
+    } else
+    {
+        UE_LOG(LogTemp, Warning, TEXT("WE NOT FOUND PLAYER START!!!!!"))
+    }
+
 }
