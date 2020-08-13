@@ -39,10 +39,6 @@ private:
 
     UFUNCTION()
     void LevelComplete();
-
-    void SubscribeToLevelCompleteEvent();
-
-    void FindPlayerStartPosition();
-
-	
+    
+    void StartNextLevel();
 };
