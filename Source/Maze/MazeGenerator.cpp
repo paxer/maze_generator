@@ -1,10 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
 
-#include "MazeGenerator.h"
-
 #include "Wall.h"
-
+#include "MazeGenerator.h"
 
 const int MazeSizeMax = 101;
 
@@ -60,15 +58,29 @@ void AMazeGenerator::GenerateMaze(const int TileX, const int TileY)
     {
         for (int y = 0; y < TileY; y++)
         {
+            const FVector Location(CaptureX, CaptureY, 0.0f);
             if (y == 0 || x == 0 || y == TileY - 1 || x == TileX - 1 || y % 2 == 0 && x % 2 == 0)
             {
-                const FVector Location(CaptureX, CaptureY, 0.0f);
+                
                 MazeGrid.Rows[x].Columns[y] = SpawnBlock(Wall, Location);
             }
             else
             {
-                const FVector Location(CaptureX, CaptureY, 0.0f);
                 MazeGrid.Rows[x].Columns[y] = SpawnBlock(Ground, Location);;
+            }
+
+            // spawn PlayerStart
+            if (CaptureX == Offset && CaptureY == Offset)
+            {
+                const auto CenterBlockLocation = FVector(Location.X + (Offset / 2), Location.Y + (Offset / 2), Location.Z + (Offset / 2));                 
+                SpawnBlock(PlayerStart, CenterBlockLocation);
+            }
+
+            // spawn ExitPortal
+            if (y == TileY - 1 && x == TileX - 1)
+            {
+                const auto CenterBlockLocation = FVector(Location.X - (Offset / 2), Location.Y - (Offset / 2), Location.Z + (Offset / 2)); 
+                SpawnBlock(ExitPortal, CenterBlockLocation);                
             }
 
             CaptureY += Offset;
@@ -140,6 +152,10 @@ void AMazeGenerator::GenerateMaze(const int TileX, const int TileY)
 
 AActor* AMazeGenerator::SpawnBlock(UClass* BlockType, const FVector Location, const FRotator Rotation)
 {
+    if(BlockType == nullptr)
+    {
+        return nullptr;
+    }
     AActor* NewBlock = GetWorld()->SpawnActor<AActor>(BlockType, Location, Rotation);
     #if WITH_EDITOR
         NewBlock->SetFolderPath("/Maze");

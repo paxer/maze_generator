@@ -110,6 +110,12 @@ public:
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Maze Properites")
     TSubclassOf<AActor> Ground;
 
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Maze Properites")
+    TSubclassOf<AActor> ExitPortal;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Maze Properites")
+    TSubclassOf<AActor> PlayerStart;
+
     UFUNCTION(BlueprintCallable, Category = MazeGen)
     void GenerateMaze(int TileX, int TileY);
 
