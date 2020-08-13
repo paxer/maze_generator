@@ -23,10 +23,7 @@ protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;    
 
-private:
-
-    bool bIsGameplayMap; //  means we load levels from the Levels array
-	
+private:	
     AActor* CurrentLevel;
     
     FTimerHandle MazeCompletionTimerHandle;

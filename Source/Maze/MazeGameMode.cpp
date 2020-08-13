@@ -10,7 +10,6 @@ AMazeGameMode::AMazeGameMode() : Super()
     PrimaryActorTick.bCanEverTick = true;
     TotalSecondsMazeCompletion = 0;
     CurrentLevelIndex = 0;
-    bIsGameplayMap = false;    
 }
 
 void AMazeGameMode::BeginPlay()
@@ -22,21 +21,8 @@ void AMazeGameMode::BeginPlay()
 
     if (LevelName.Contains("TestLoadLevels"))
     {
-        bIsGameplayMap = true;
-    }
-
-    GetWorldTimerManager().SetTimer(MazeCompletionTimerHandle, this, &AMazeGameMode::IncrementMazeCompletionTime, 1.0f, true);    
-
-    if (bIsGameplayMap)
-    {
         StartNextLevel();
-        //if (Levels.Num() > 0)
-        //{
-        //    if (Levels[CurrentLevelIndex])
-          //  {
-                //StartLevel(Levels[CurrentLevelIndex]);
-            //}
-        //}    	
+        GetWorldTimerManager().SetTimer(MazeCompletionTimerHandle, this, &AMazeGameMode::IncrementMazeCompletionTime, 1.0f, true);
     }
 }
 
@@ -48,7 +34,7 @@ void AMazeGameMode::Tick(float DeltaTime)
 
 void AMazeGameMode::IncrementMazeCompletionTime()
 {
-    TotalSecondsMazeCompletion = TotalSecondsMazeCompletion + 1;
+    TotalSecondsMazeCompletion++;
 }
 
 void AMazeGameMode::LevelComplete()
@@ -72,8 +58,8 @@ void AMazeGameMode::StartNextLevel()
     {
         GEngine->AddOnScreenDebugMessage(-1, 25.0f, FColor::Red, TEXT("END GAME!"));
         return;
-    }    	
-    
+    }
+
     const auto Location = FVector(0, 0, 0);
     const auto Rotation = FRotator(0, 0, 0);
     CurrentLevel = GetWorld()->SpawnActor<AActor>(Levels[CurrentLevelIndex], Location, Rotation);
