@@ -1,8 +1,8 @@
 // Fill out your copyright notice in the Description page of Project Settings.
 
-
-#include "Wall.h"
 #include "MazeGenerator.h"
+#include "Wall.h"
+#include "Editor.h"
 
 const int MazeSizeMax = 101;
 
@@ -12,6 +12,18 @@ AMazeGenerator::AMazeGenerator()
     PrimaryActorTick.bCanEverTick = true;
     SizeX = 5;
     SizeY = 5;
+    RegenerateMaze = false;
+}
+
+void AMazeGenerator::PostEditChangeProperty(struct FPropertyChangedEvent& e)
+{
+    Super::PostEditChangeProperty(e);    
+    FName PropertyName = (e.Property != NULL) ? e.Property->GetFName() : NAME_None;
+    if (PropertyName == GET_MEMBER_NAME_CHECKED(AMazeGenerator, RegenerateMaze))
+    {
+        RegenerateMaze = false;
+        GenerateMaze(SizeX, SizeY);        
+    }    
 }
 
 // Called when the game starts or when spawned
@@ -49,8 +61,19 @@ void AMazeGenerator::GenerateMaze(const int TileX, const int TileY)
     float CaptureY = 0.0f;
     const float Offset = 350.0f;
 
+
+    // Destroy already spawned PlayerStart and ExitPortal if spawned in editor
+    if(SpawnedPlayerStart != nullptr)
+    {
+        SpawnedPlayerStart->Destroy();
+    }
+    if(SpawnedExitPortal != nullptr)
+    {
+        SpawnedExitPortal->Destroy();
+    }
+
     //Init Maze
-    MazeGrid.Clear();
+    MazeGrid.Clear();    
     MazeGrid.AddUninitialized(TileX, TileY);
 
     // this builds outer walls and the initial symmetric grid structure filled with walls separated equally by ground blocks
@@ -73,14 +96,14 @@ void AMazeGenerator::GenerateMaze(const int TileX, const int TileY)
             if (CaptureX == Offset && CaptureY == Offset)
             {
                 const auto CenterBlockLocation = FVector(Location.X + (Offset / 2), Location.Y + (Offset / 2), Location.Z + (Offset / 2));                 
-                SpawnBlock(PlayerStart, CenterBlockLocation);
+                SpawnedPlayerStart = SpawnBlock(PlayerStart, CenterBlockLocation);
             }
 
             // spawn ExitPortal
             if (y == TileY - 1 && x == TileX - 1)
             {
                 const auto CenterBlockLocation = FVector(Location.X - (Offset / 2), Location.Y - (Offset / 2), Location.Z + (Offset / 2)); 
-                SpawnBlock(ExitPortal, CenterBlockLocation);                
+                SpawnedExitPortal = SpawnBlock(ExitPortal, CenterBlockLocation);                
             }
 
             CaptureY += Offset;

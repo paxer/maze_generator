@@ -99,6 +99,9 @@ class MAZE_API AMazeGenerator : public AActor
 public:
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Maze Properites")
+    bool RegenerateMaze;
+
+    UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Maze Properites")
     int SizeX;
 
     UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Maze Properites")
@@ -125,6 +128,8 @@ public:
     // Sets default values for this actor's properties
     AMazeGenerator();
 
+    virtual void PostEditChangeProperty(struct FPropertyChangedEvent& e) override;
+
 protected:
     // Called when the game starts or when spawned
     virtual void BeginPlay() override;
@@ -134,6 +139,10 @@ public:
     virtual void Tick(float DeltaTime) override;
 
  private:
+
+    AActor* SpawnedPlayerStart;
+    AActor* SpawnedExitPortal;
+    
     void ReplaceBlock(UClass* NewBlock, int MazeX, int MazeY);
     AActor* SpawnBlock(UClass* BlockType, FVector Location, FRotator Rotation = FRotator(0,0,0));
 };
