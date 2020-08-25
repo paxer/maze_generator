@@ -2,7 +2,6 @@
 
 #include "MazeGenerator.h"
 #include "Wall.h"
-#include "Editor.h"
 
 const int MazeSizeMax = 101;
 
